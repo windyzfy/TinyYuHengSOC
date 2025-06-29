@@ -84,8 +84,8 @@ module riscv_core(
         .reg1_rdata_o   (regs_reg1_rdata_o),
         .reg2_rdata_o   (regs_reg2_rdata_o),
         .reg_waddr_i    (ex_rd_addr_o),
-        .reg_wdata_i    (id_ex_rd_addr_o),
-        .reg_wen        (id_ex_reg_wen)
+        .reg_wdata_i    (ex_rd_data_o),
+        .reg_wen        (ex_reg_wen_o)
     );
 
     id_ex id_ex_inst(

@@ -1,0 +1,35 @@
+module tb_soc;
+    reg clk;
+    reg rst_n;
+
+    always #10 clk = ~clk;
+
+    initial begin
+        clk     <= 1'b1;
+        rst_n   <=  1'b0;
+        #20;
+        rst_n   <= 1'b1;
+    end
+
+    riscv_soc riscv_soc_inst(
+        .clk        (clk),
+        .rst_n      (rst_n)
+    );
+
+    //rom initial
+    initial begin
+        $readmemb("inst_data_add.txt",tb_soc.riscv_soc_inst.rom_inst.rom_mem);
+    end
+
+    //display regs
+    initial begin
+        while(1)begin
+            @(posedge clk)
+            $display("x27 register value id %d",tb_soc.riscv_soc_inst.riscv_core_inst.regs_inst.regs[27]);
+            $display("x28 register value id %d",tb_soc.riscv_soc_inst.riscv_core_inst.regs_inst.regs[28]);
+            $display("x29 register value id %d",tb_soc.riscv_soc_inst.riscv_core_inst.regs_inst.regs[29]);
+            $display("---------------------------");
+        end
+    end
+    
+endmodule

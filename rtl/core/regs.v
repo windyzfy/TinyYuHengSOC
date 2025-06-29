@@ -8,8 +8,8 @@ module regs(
           output reg [31:0] reg1_rdata_o,
           output reg [31:0] reg2_rdata_o,
           //form ex
-          input wire [31:0] reg_waddr_i,
-          input wire [4:0]  reg_wdata_i,
+          input wire [4:0] reg_waddr_i,
+          input wire [31:0]  reg_wdata_i,
           input wire reg_wen
  );
           reg [31:0] regs[0:31];        //定义寄存器组
