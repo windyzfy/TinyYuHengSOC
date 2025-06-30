@@ -77,7 +77,7 @@ module id(
             //R型指令 & M型指令
             `INST_TYPE_R_M : begin
                 case(func3) 
-                    `INST_ADD_SUB : begin   //add 还是 sub需要通过func7进一步判断
+                    `INST_ADD_SUB, `INST_SLL, `INST_SLT, `INST_SLTU, `INST_XOR, `INST_SR, `INST_OR, `INST_AND : begin   //R type inst
                         rs1_addr_o = rs1;
                         rs2_addr_o = rs2;
                         //传操作数

@@ -121,11 +121,53 @@ module ex(
                             reg_wen_o = 1'b1;
                         end
                         else begin      //sub指令
-                            rd_data_o = op2_i - op1_i;
+                            rd_data_o = op1_i - op2_i;
                             rd_addr_o = rd_addr_i;
                             reg_wen_o = 1'b1;
                         end
                     end
+                    `INST_SLL : begin
+                        rd_data_o = op1_i << op2_i[4:0];
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_SLT : begin
+                        rd_data_o = {31'b0,op1_i_less_op2_i_signed};
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_SLTU : begin
+                        rd_data_o = {31'b0,op1_i_less_op2_i_unsigned};
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end       
+                    `INST_XOR : begin
+                        rd_data_o = op1_i ^ op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end                      
+                    `INST_SR : begin
+                        if(func7 == 7'b000_0000)begin   //SRL shift right logical
+                            rd_data_o = op1_i >> op2_i[4:0];
+                            rd_addr_o = rd_addr_i;
+                            reg_wen_o = 1'b1;
+                        end
+                        else begin  //SRL shift right arith
+                            rd_data_o = ((op1_i >> op2_i[4:0]) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+                            rd_addr_o = rd_addr_i;
+                            reg_wen_o = 1'b1;
+                        end
+                    end
+                    `INST_OR : begin
+                        rd_data_o = op1_i | op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end   
+                    `INST_AND : begin
+                        rd_data_o = op1_i & op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end                   
                     default : begin
                         rd_data_o = 32'b0;
                         rd_addr_o = 5'b0;
