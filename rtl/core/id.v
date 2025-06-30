@@ -88,7 +88,7 @@ module id(
             //J Type B
             `INST_TYPE_B :begin
                 case(func3)
-                    `INST_BNE : begin
+                    `INST_BNE,`INST_BEQ : begin
                         rs1_addr_o = rs1;
                         rs2_addr_o = rs2;
                         //传操作数
