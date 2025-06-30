@@ -121,7 +121,7 @@ module id(
                 endcase
             end
             `INST_JAL: begin
-                rs1_addr_o = 5'b0;
+                rs1_addr_o = rs1;
                 rs2_addr_o = 5'b0;
                 op1_o      = {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};
                 op2_o      = 32'b0;
@@ -133,6 +133,22 @@ module id(
                 rs2_addr_o = 5'b0;
                 op1_o      = {inst_i[31:12],12'b0};
                 op2_o      = 32'b0;
+                reg_wen    = 1'b1;
+                rd_addr_o  = rd; 
+            end
+            `INST_JALR: begin
+                rs1_addr_o = rs1;
+                rs2_addr_o = 5'b0;
+                op1_o      = rs1_data_i;
+                op2_o      = {{20{inst_i[31]}},inst_i[31:20]};
+                reg_wen    = 1'b1;
+                rd_addr_o  = rd; 
+            end
+            `INST_AUIPC: begin
+                rs1_addr_o = 5'b0;
+                rs2_addr_o = 5'b0;
+                op1_o      = inst_addr_i;
+                op2_o      = {inst_i[31:12], 12'b0};
                 reg_wen    = 1'b1;
                 rd_addr_o  = rd; 
             end

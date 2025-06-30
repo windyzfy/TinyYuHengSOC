@@ -22,7 +22,7 @@ module tb_soc;
 
     //rom initial
     initial begin
-        $readmemh("rv32ui-p-blt.txt",tb_soc.riscv_soc_inst.rom_inst.rom_mem);
+        $readmemh("rv32ui-p-auipc.txt",tb_soc.riscv_soc_inst.rom_inst.rom_mem);
     end
     integer r;
 
