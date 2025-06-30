@@ -22,24 +22,32 @@ module ex(
     wire [2:0] func3;
     wire [4:0] rs1;
     wire [11:0] imm;
+    wire [4:0]  shamt;
+    wire [31:0] SRA_mask;
 
     wire [6:0] func7;
     wire [4:0] rs2;
     
     wire [31:0] jump_imm;
     wire        op1_i_equal_op2_i;
+    wire        op1_i_less_op2_i_signed;
+	wire        op1_i_less_op2_i_unsigned;
     //I型指令
     assign opcode = inst_i[6:0];
     assign rd     = inst_i[11:7];
     assign func3  = inst_i[14:12];
     assign rs1    = inst_i[19:15];
     assign imm    = inst_i[31:20];
+    assign shamt  = inst_i[24:20];
+    assign SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
     //R型指令
     assign func7  = inst_i[31:25];
     assign rs2    = inst_i[24:20];
     //J Type B
     assign jump_imm = {{19{inst_i[31]}},inst_i[31],inst_i[7],inst_i[30:25],inst_i[11:8],1'b0};
     assign op1_i_equal_op2_i = (op1_i == op2_i) ? 1'b1 : 1'b0;
+    assign op1_i_less_op2_i_signed = ($signed(op1_i) < $signed(op2_i))?1'b1:1'b0;
+    assign op1_i_less_op2_i_unsigned = (op1_i < op2_i) ? 1'b1 : 1'b0;
     always @(*)begin
         case(opcode)
             `INST_TYPE_I : begin
@@ -51,6 +59,48 @@ module ex(
                         rd_data_o = op1_i + op2_i;
                         rd_addr_o = rd_addr_i;
                         reg_wen_o = 1'b1;
+                    end
+                    `INST_SLTI : begin
+                        rd_data_o = {31'b0,op1_i_less_op2_i_signed};
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_SLTIU : begin
+                        rd_data_o = {31'b0,op1_i_less_op2_i_unsigned};
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_XORI : begin
+                        rd_data_o = op1_i ^ op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_ORI : begin
+                        rd_data_o = op1_i | op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_ANDI : begin
+                        rd_data_o = op1_i & op2_i;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_SLLI : begin  //shift left logical imm
+                        rd_data_o = op1_i << shamt;
+                        rd_addr_o = rd_addr_i;
+                        reg_wen_o = 1'b1;
+                    end
+                    `INST_SRI : begin
+                        if(func7 == 7'b000_0000)begin   //shift right logical imm
+                            rd_data_o = op1_i >> shamt;
+                            rd_addr_o = rd_addr_i;
+                            reg_wen_o = 1'b1;
+                        end
+                        else begin
+                            rd_data_o = ((op1_i >> shamt) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+                            rd_addr_o = rd_addr_i;
+                            reg_wen_o = 1'b1;
+                        end
                     end
                     default : begin
                         rd_data_o = 32'b0;

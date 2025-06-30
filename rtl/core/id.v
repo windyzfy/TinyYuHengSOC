@@ -17,11 +17,12 @@ module id(
     output reg [4:0]  rd_addr_o,
     output reg reg_wen  //写回使能信号，是否写回rd
 );
-    wire [6:0] opcode;
-    wire [4:0] rd;
-    wire [2:0] func3;
-    wire [4:0] rs1;
+    wire [6:0]  opcode;
+    wire [4:0]  rd;
+    wire [2:0]  func3;
+    wire [4:0]  rs1;
     wire [11:0] imm;
+    wire [4:0]  shamt;
 
     wire [6:0] func7;
     wire [4:0] rs2;
@@ -31,6 +32,7 @@ module id(
     assign func3  = inst_i[14:12];
     assign rs1    = inst_i[19:15];
     assign imm    = inst_i[31:20];
+    assign shamt  = inst_i[24:20];
     //R型指令
     assign func7  = inst_i[31:25];
     assign rs2    = inst_i[24:20];
@@ -42,12 +44,22 @@ module id(
             //I型指令
             `INST_TYPE_I : begin          
                 case(func3) 
-                    `INST_ADDI : begin
+                    `INST_ADDI, `INST_SLTI, `INST_SLTIU, `INST_XORI, `INST_ORI, `INST_ANDI: begin
                         rs1_addr_o = rs1;
                         rs2_addr_o = 5'b0;
                         //传操作数
                         op1_o      = rs1_data_i;
                         op2_o      = {{20{imm[11]}},imm};
+                        //写回操作
+                        reg_wen    = 1'b1;
+                        rd_addr_o  = rd;
+                    end
+                    `INST_SLLI,`INST_SRI: begin
+                        rs1_addr_o = rs1;
+                        rs2_addr_o = 5'b0;
+                        //传操作数
+                        op1_o      = rs1_data_i;
+                        op2_o      = {27'b0,shamt};
                         //写回操作
                         reg_wen    = 1'b1;
                         rd_addr_o  = rd;
